@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 public class CategoryController {
+    // 自动装配mapper
     @Autowired
     CategoryMapper categoryMapper;
 
