@@ -24,7 +24,8 @@
                     list: function () {
                         var url = this.uri
                         axios.get(url).then(function (response) {
-                            vue.beans = response.data;
+                            var page = response.data
+                            vue.beans = page["list"];
                         })
                     }
                 }
