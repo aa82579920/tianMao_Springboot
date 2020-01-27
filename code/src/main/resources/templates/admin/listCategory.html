@@ -9,6 +9,7 @@
         $(function () {
             var data4Vue = {
                 uri: 'categories',
+                pagination: {},
                 beans: []
             }
 
@@ -18,15 +19,37 @@
                 data: data4Vue,
                 mounted: function () {
                     // 若vue对象加载成功
-                    this.list()
+                    this.list(1)
                 },
                 methods: {
-                    list: function () {
-                        var url = this.uri
+                    // 从后端获取分页数据
+                    list: function (start) {
+                        var url = this.uri + "?start=" + start
                         axios.get(url).then(function (response) {
-                            var page = response.data
-                            vue.beans = page["list"];
+                            vue.pagination = response.data
+                            console.log(vue.pagination)
+                            vue.beans = response.data.list
                         })
+                    },
+                    // 跳转
+                    jump: function (page) {
+                        console.log('jump'+page)
+                        if('first'== page && !vue.pagination.isFirstPage)
+                            vue.list(1);
+
+                        else if('pre'== page &&	vue.pagination.hasPreviousPage )
+                            vue.list(vue.pagination.prePage);
+
+                        else if('next'== page && vue.pagination.hasNextPage)
+                            vue.list(vue.pagination.nextPage);
+
+                        else if('last'== page && !vue.pagination.isLastPage)
+                            vue.list(vue.pagination.pages);
+
+                    },
+                    jumpByNumber: function (start) {
+                        if(start!=vue.pagination.pageNum)
+                            vue.list(start);
                     }
                 }
             })
@@ -74,6 +97,31 @@
                 </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="pageDiv" th:fragment="html">
+            <nav>
+                <ul class="pagination">
+                    <li :class="{ disabled: pagination.isFirstPage }">
+                        <a  href="#nowhere" @click="jump('first')">«</a>
+                    </li>
+                    <li :class="{ disabled: !pagination.hasPreviousPage }">
+                        <a  href="#nowhere" @click="jump('pre')">‹</a>
+                    </li>
+
+                    <li  v-for="i in pagination.navigatepageNums">
+                        <a href="#nowhere" @click="jumpByNumber(i)" >
+                            {{i}}
+                        </a>
+                    </li>
+
+                    <li :class="{ disabled: !pagination.hasNextPage }">
+                        <a  href="#nowhere" @click="jump('next')">›</a>
+                    </li>
+                    <li :class="{ disabled: pagination.isLastPage }">
+                        <a  href="#nowhere" @click="jump('last')">»</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
     <div th:replace="../templates/admin/adminFooter::html"></div>
