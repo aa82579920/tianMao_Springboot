@@ -65,4 +65,10 @@ public class CategoryController {
         }
         return null;
     }
+
+    @GetMapping(value = "/categories/{id}")
+    public Category get(@PathVariable("id") int id) {
+        Category category = categoryMapper.get(id);
+        return category;
+    }
 }
