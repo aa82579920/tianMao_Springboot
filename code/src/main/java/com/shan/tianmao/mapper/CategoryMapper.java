@@ -22,4 +22,5 @@ public interface CategoryMapper {
 
     @Update("update category set name=#{name} where id=#{id} ")
     int update(Category category);
+
 }

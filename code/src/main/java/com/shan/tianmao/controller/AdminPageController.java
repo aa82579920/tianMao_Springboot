@@ -21,4 +21,5 @@ public class AdminPageController {
     public String hello(){
         return "admin/hello";
     }
+
 }
