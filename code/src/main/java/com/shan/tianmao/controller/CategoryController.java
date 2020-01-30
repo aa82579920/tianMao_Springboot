@@ -55,5 +55,14 @@ public class CategoryController {
         ImageIO.write(img, "jpg", file);
     }
 
-
+    @DeleteMapping("/categories/{id}")
+    public String delete(@PathVariable("id") int id, HttpServletRequest request) throws Exception {
+        categoryMapper.delete(id);
+        File folder = new File(request.getServletContext().getRealPath("img/category"));
+        File file = new File(folder, id+".jpg");
+        if(file != null) {
+            file.delete();
+        }
+        return null;
+    }
 }
