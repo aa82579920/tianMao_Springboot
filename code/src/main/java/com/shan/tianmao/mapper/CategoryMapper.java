@@ -17,7 +17,7 @@ public interface CategoryMapper {
     @Delete("delete from category where id= #{id} ")
     void delete(int id);
 
-    @Select("select * from category where id= #{id} ")
+    @Select("select * from category where id=#{id} ")
     Category get(int id);
 
     @Update("update category set name=#{name} where id=#{id} ")

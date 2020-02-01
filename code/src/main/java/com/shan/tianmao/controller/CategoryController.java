@@ -71,4 +71,16 @@ public class CategoryController {
         Category category = categoryMapper.get(id);
         return category;
     }
+
+    @PutMapping("/categories/{id}")
+    public Object update(Category bean, MultipartFile image,HttpServletRequest request) throws Exception {
+        String name = request.getParameter("name");
+        bean.setName(name);
+        categoryMapper.update(bean);
+
+        if(image!=null) {
+            saveOrUpdateImageFile(bean, image, request);
+        }
+        return bean;
+    }
 }
