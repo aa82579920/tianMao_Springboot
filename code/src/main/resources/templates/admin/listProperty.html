@@ -110,37 +110,36 @@
 <body>
 <div th:replace="../templates/admin/adminNavigator::html" ></div>
 <script>
-    $(function(){
+    $(function () {
         var cid = getUrlParms("cid");
         var data4Vue = {
-            uri:'properties',
+            uri: 'properties',
             beans: [],
-            bean: {id:0,name:'',category:{id:0}},
-            pagination:{},
-            category:''
-        };
+            bean: {id:0, name: '', category: {id: 0}},
+            pagination: {},
+            category: {}
+        }
 
-        //ViewModel
         var vue = new Vue({
-            el: '#workingArea',
+            el: "#workingArea",
             data: data4Vue,
-            mounted:function(){ //mounted　表示这个 Vue 对象加载成功了
+            mounted: function () {
                 this.getCategory(cid);
                 this.list(0);
             },
             methods: {
-                getCategory:function(cid){
-                    var url = "categories/"+cid;
-                    axios.get(url).then(function(response) {
-                        vue.category = response.data;
+                getCategory: function (cid) {
+                    var url = "categories/" + cid;
+                    axios.get(url).then(function (response) {
+                        vue.category = response.data
                     })
                 },
-                list:function(start){
-                    var url =  "categories/"+cid+"/"+this.uri+"?start="+start;
-                    axios.get(url).then(function(response) {
-                        vue.pagination = response.data;
-                        vue.beans = response.data.content   ;
-                    });
+                list: function (start) {
+                    var url = "categories/"+cid+"/"+this.uri+"?start="+start;
+                    axios.get(url).then(function (response) {
+                        vue.pagination = response.data
+                        vue.beans = response.data.list
+                    })
                 },
                 add: function () {
                     if(!checkEmpty(this.bean.name, "属性名称"))
@@ -153,27 +152,41 @@
                     });
                 },
                 deleteBean: function (id) {
-                    if(!checkDeleteLink())
-                        return;
-                    var url = this.uri+"/"+id;
-                    axios.delete(url).then(function(response){
-                        if(0!=response.data.length)
-                            alert(response.data);
-                        else
+                    if(!checkDeleteLink())  {
+                        return ;
+                    }
+                    var url = this.uri + "/" + id;
+                    axios.delete(url).then(function (response) {
+                        if(0 != response.data) {
+                            alert(response.data)
+                        }else {
                             vue.list(0);
-                    });
+                        }
+                    })
                 },
-                jump: function(page){
-                    jump(page,vue); //定义在adminHeader.html 中
+                // 跳转
+                jump: function (page) {
+                    console.log('jump'+page)
+                    if('first'== page && !vue.pagination.isFirstPage)
+                        vue.list(1);
+
+                    else if('pre'== page &&	vue.pagination.hasPreviousPage )
+                        vue.list(vue.pagination.prePage);
+
+                    else if('next'== page && vue.pagination.hasNextPage)
+                        vue.list(vue.pagination.nextPage);
+
+                    else if('last'== page && !vue.pagination.isLastPage)
+                        vue.list(vue.pagination.pages);
+
                 },
-                jumpByNumber: function(start){
-                    jumpByNumber(start,vue);
-                }
+                jumpByNumber: function (start) {
+                    if(start!=vue.pagination.pageNum)
+                        vue.list(start);
+                },
             }
-
-        });
-    });
-
+        })
+    })
 </script>
 
 <div id="workingArea" >

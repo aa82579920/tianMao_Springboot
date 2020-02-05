@@ -7,10 +7,7 @@ import com.shan.tianmao.mapper.PropertyMapper;
 import com.shan.tianmao.pojo.Category;
 import com.shan.tianmao.pojo.Property;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,5 +32,22 @@ public class PropertyController {
 
 
         return page;
+    }
+
+    @GetMapping("/properties/{id}")
+    public Property get(@PathVariable("id") int id) {
+        Property property = propertyMapper.get(id);
+        return property;
+    }
+    @DeleteMapping("/properties/{id}")
+    public String delete(@PathVariable("id") int id) {
+        propertyMapper.delete(id);
+        return null;
+    }
+
+    @PostMapping("/properties")
+    public Object add(@RequestBody Property bean) {
+        propertyMapper.add(bean);
+        return bean;
     }
 }
