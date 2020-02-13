@@ -9,6 +9,7 @@ import com.shan.tianmao.pojo.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -40,7 +41,11 @@ public class ProductController {
 
     @PostMapping("/products")
     public Object add(@RequestBody Product product)throws Exception {
-        product.setCreateDate(new Date());
+        SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date nowDate= new Date();
+        String dateStr= sdf.format(nowDate);
+        product.setCreateDate(dateStr);
+        System.out.println(product);
         productMapper.add(product);
         return product;
     }

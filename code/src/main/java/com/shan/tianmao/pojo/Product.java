@@ -10,7 +10,7 @@ public class Product {
     private float  originalPrice;
     private float promotePrice;
     private int stock;
-    private Date createDate;
+    private String createDate;
 
     public int getId() {
         return id;
@@ -68,11 +68,16 @@ public class Product {
         this.stock = stock;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Product:" + this.getName() + " " + this.getSubTitle();
     }
 }

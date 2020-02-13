@@ -46,11 +46,12 @@ public class PropertyController {
 
     @PostMapping("/properties")
     public Object add(@RequestBody Property bean) {
+        System.out.println();
         propertyMapper.add(bean);
         return bean;
     }
 
-    @PutMapping("/products")
+    @PutMapping("/properties")
     public Object update(@RequestBody Property property) throws Exception{
         propertyMapper.update(property);
         return property;
