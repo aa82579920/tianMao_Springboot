@@ -25,7 +25,6 @@ public class PropertyController {
             @RequestParam(value = "size", defaultValue = "5") int size) throws Exception{
         PageHelper.startPage(start, size, "id desc");
         Category category = categoryMapper.get(id);
-        System.out.println(category.getName());
         List<Property> list = propertyMapper.findByCategory(category);
 //        List<Property> list = propertyMapper.findAll();
         PageInfo<Property> page = new PageInfo<>(list);
@@ -49,5 +48,11 @@ public class PropertyController {
     public Object add(@RequestBody Property bean) {
         propertyMapper.add(bean);
         return bean;
+    }
+
+    @PutMapping("/products")
+    public Object update(@RequestBody Property property) throws Exception{
+        propertyMapper.update(property);
+        return property;
     }
 }

@@ -25,7 +25,7 @@ public interface ProductMapper {
             @Result(property = "category", column = "cid",
                     one = @One(select = "com.shan.tianmao.mapper.CategoryMapper.get"))
     })
-    int get(int id);
+    Product get(int id);
 
     @Select("select * from product where cid=#{category.id}")
     @Results({
