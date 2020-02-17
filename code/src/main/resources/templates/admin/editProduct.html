@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <script src="/tianmao/js/jquery/2.0.0/jquery.min.js"></script>
+    <link href="/tianmao/css/bootstrap/3.3.6/bootstrap.min.css" rel="stylesheet">
+    <script src="/tianmao/js/bootstrap/3.3.6/bootstrap.min.js"></script>
+    <script src="/tianmao/js/vue/2.5.16/vue.min.js"></script>
+    <script src="/tianmao/js/axios/0.17.1/axios.min.js"></script>
+    <script src="/tianmao/js/moment/2.22.2/moment.js"></script> <!-- vue.js 格式化日期用的 -->
+    <link href="/tianmao/css/back/style.css" rel="stylesheet">
+
+    <script>
+        //判断是否为空
+        function checkEmpty(value,text){
+
+            if(null==value || value.length==0){
+                alert(text+ "不能为空");
+                return false;
+            }
+            return true;
+        }
+
+        //获取地址栏参数的函数
+        function getUrlParms(para){
+            var search=location.search; //页面URL的查询部分字符串
+            var arrPara=new Array(); //参数数组。数组单项为包含参数名和参数值的字符串，如“para=value”
+            var arrVal=new Array(); //参数值数组。用于存储查找到的参数值
+
+            if(search!=""){
+                var index=0;
+                search=search.substr(1); //去除开头的“?”
+                arrPara=search.split("&");
+
+                for(i in arrPara){
+                    var paraPre=para+"="; //参数前缀。即参数名+“=”，如“para=”
+                    if(arrPara[i].indexOf(paraPre)==0&& paraPre.length<arrPara[i].length){
+                        arrVal[index]=decodeURI(arrPara[i].substr(paraPre.length)); //顺带URI解码避免出现乱码
+                        index++;
+                    }
+                }
+            }
+
+            if(arrVal.length==1){
+                return arrVal[0];
+            }else if(arrVal.length==0){
+                return null;
+            }else{
+                return arrVal;
+            }
+        }
+
+        //判断是否数字 (小数和整数)
+        function checkNumber(value, text){
+
+            if(value.length==0){
+                alert(text+ "不能为空");
+                return false;
+            }
+            if(isNaN(value)){
+                alert(text+ "必须是数字");
+                return false;
+            }
+            return true;
+        }
+        //判断是否整数
+        function checkInt(value, text){
+
+            if(value.length==0){
+                alert(text+ "不能为空");
+                return false;
+            }
+            if(parseInt(value)!=value){
+                alert(text+ "必须是整数");
+                return false;
+            }
+            return true;
+        }
+
+        //确实是否要删除
+        function checkDeleteLink(){
+            var confirmDelete = confirm("确认要删除");
+            if(confirmDelete)
+                return true;
+            return false;
+        }
+        //跳转函数
+        function jump(page,vue){
+            if('first'== page && !vue.pagination.isFirstPage)
+                vue.list(0);
+
+            else if('pre'== page &&	vue.pagination.hasPreviousPage )
+                vue.list(vue.pagination.pageNum-1);
+
+            else if('next'== page && vue.pagination.hasNext)
+                vue.list(vue.pagination.pageNum+1);
+
+            else if('last'== page && !vue.pagination.isLastPage)
+                vue.list(vue.pagination.pages-1);
+        }
+        //跳转函数
+        function jumpByNumber(start,vue){
+            if(start!=vue.pagination.pageNum)
+                vue.list(start);
+        }
+    </script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>编辑产品</title>
+</head>
+<body>
+<div th:replace="../templates/admin/adminNavigator::html" ></div>
+<script>
+    $(function(){
+        var data4Vue = {
+            uri: 'products',
+            listURL:'admin_product_list',
+            bean: '',
+            category:''
+        };
+
+        //ViewModel
+        var vue = new Vue({
+            el: '#workingArea',
+            data: data4Vue,
+            mounted:function(){ //mounted　表示这个 Vue 对象加载成功了
+                this.get();
+            },
+            methods: {
+                get:function(){
+                    var id = getUrlParms("id");
+                    var url = this.uri+"/"+id;
+                    axios.get(url).then(function(response) {
+                        vue.bean = response.data;
+                        vue.category = vue.bean.category;
+                    })
+                },
+                update:function () {
+                    if(!checkEmpty(this.bean.name, "产品名称"))
+                        return;
+                    if (!checkEmpty(this.bean.subTitle, "小标题"))
+                        return;
+                    if (!checkNumber(this.bean.originalPrice, "原价格"))
+                        return;
+                    if (!checkNumber(this.bean.promotePrice, "优惠价格"))
+                        return;
+                    if (!checkInt(this.bean.stock, "库存"))
+                        return;
+                    var url = this.uri;
+                    axios.put(url,vue.bean).then(function(response){
+                        location.href=vue.listURL+"?cid="+vue.category.id;
+                    });
+                }
+            }
+        });
+    });
+</script>
+
+<div id="workingArea">
+
+    <ol class="breadcrumb">
+        <li><a href="admin_category_list">所有分类</a></li>
+        <li><a :href="'admin_product_list?cid='+category.id">{{category.name}}</a></li>
+        <li class="active">产品管理</li>
+    </ol>
+
+    <div class="panel panel-warning editDiv">
+        <div class="panel-heading">编辑产品</div>
+        <div class="panel-body">
+            <table class="editTable">
+                <tr>
+                    <td>产品名称</td>
+                    <td><input  @keyup.enter="update" v-model.trim="bean.name" type="text" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>产品小标题</td>
+                    <td><input  @keyup.enter="update" v-model.trim="bean.subTitle" type="text"
+                                class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>原价格</td>
+                    <td><input  @keyup.enter="update" v-model.trim="bean.originalPrice"  type="text"
+                                class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>优惠价格</td>
+                    <td><input  @keyup.enter="update" v-model.trim="bean.promotePrice" type="text"
+                                class="form-control"></td>
+                </tr>
+                <tr>
+                    <td>库存</td>
+                    <td><input  @keyup.enter="update" v-model.trim="bean.stock"  type="text"
+                                class="form-control"></td>
+                </tr>
+                <tr class="submitTR">
+                    <td colspan="2" align="center">
+                        <input type="hidden" name="id"   v-model.trim="bean.id" >
+                        <a href="#nowhere" class="btn btn-success" @click="update">提 交</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="include/admin/adminFooter::html" ></div>
+</body>
+</html>
