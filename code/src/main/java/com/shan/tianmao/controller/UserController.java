@@ -24,7 +24,10 @@ public class UserController {
         PageHelper.startPage(start, size, "id desc");
         List<User> list = userMapper.findAll();
         PageInfo<User> page = new PageInfo<>(list);
-
+        for (User user :
+                list) {
+            System.out.println(user.getAnonymousName());
+        }
         return page;
     }
 }
